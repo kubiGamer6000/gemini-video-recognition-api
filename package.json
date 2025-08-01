@@ -33,13 +33,13 @@
     "multer": "^2.0.2",
     "uuid": "^11.1.0",
     "winston": "^3.17.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "@types/node": "^24.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/multer": "^2.0.0",
-    "@types/node": "^24.1.0",
     "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.10",
     "serverless-http": "^3.2.0",
