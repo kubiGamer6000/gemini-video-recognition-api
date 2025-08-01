@@ -1,8 +1,8 @@
 name: gemini-video-api
 region: nyc
 services:
-  - build_command: npm run build
-    environment_slug: node-js
+- build_command: npm install --production=false && npm run build
+  environment_slug: node-js
     envs:
       - key: NODE_ENV
         scope: RUN_TIME
