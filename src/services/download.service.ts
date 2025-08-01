@@ -46,6 +46,75 @@ export class DownloadService {
   }
 
   /**
+   * Detect actual video mime type from URL and content type
+   * @param url The video URL
+   * @param detectedMimeType The mime type from headers
+   * @returns Corrected mime type
+   */
+  private correctVideoMimeType(url: string, detectedMimeType: string): string {
+    const cleanMimeType = detectedMimeType.split(";")[0].trim().toLowerCase();
+
+    // If we already have a valid video mime type, use it
+    if (cleanMimeType.startsWith("video/")) {
+      return cleanMimeType;
+    }
+
+    // If content type is generic, try to infer from URL patterns
+    if (
+      cleanMimeType === "application/octet-stream" ||
+      cleanMimeType === "binary/octet-stream"
+    ) {
+      // Check for known video CDN patterns
+      if (url.includes("fbcdn.net") || url.includes("facebook.com")) {
+        // Facebook videos are typically MP4
+        return "video/mp4";
+      }
+
+      if (url.includes("instagram.com") || url.includes("cdninstagram.com")) {
+        // Instagram videos are typically MP4
+        return "video/mp4";
+      }
+
+      if (url.includes("youtube.com") || url.includes("ytimg.com")) {
+        // YouTube videos are typically MP4
+        return "video/mp4";
+      }
+
+      if (url.includes("tiktok.com") || url.includes("tiktokcdn.com")) {
+        // TikTok videos are typically MP4
+        return "video/mp4";
+      }
+
+      // Check URL for video file extensions
+      const urlLower = url.toLowerCase();
+      if (urlLower.includes(".mp4") || urlLower.includes("mp4")) {
+        return "video/mp4";
+      }
+      if (urlLower.includes(".webm") || urlLower.includes("webm")) {
+        return "video/webm";
+      }
+      if (urlLower.includes(".mov") || urlLower.includes("mov")) {
+        return "video/quicktime";
+      }
+      if (urlLower.includes(".avi") || urlLower.includes("avi")) {
+        return "video/x-msvideo";
+      }
+
+      // Default fallback for unknown binary content from video-like URLs
+      if (
+        urlLower.includes("video") ||
+        urlLower.includes("v/") ||
+        urlLower.includes("/v?")
+      ) {
+        return "video/mp4";
+      }
+    }
+
+    // Return original if no corrections needed
+    return cleanMimeType || "video/mp4";
+  }
+
+  /**
    * Download a video from a URL to a temporary file
    * @param videoUrl URL of the video to download
    * @returns Promise<DownloadResult> Object containing file path and detected mime type
@@ -92,6 +161,20 @@ export class DownloadService {
       if (responseContentType) {
         contentType = responseContentType;
         logger.debug("Content type from response", { contentType });
+      }
+
+      // Correct the content type using URL analysis and smart detection
+      const correctedContentType = this.correctVideoMimeType(
+        videoUrl,
+        contentType
+      );
+      if (correctedContentType !== contentType) {
+        logger.info("Corrected content type", {
+          original: contentType,
+          corrected: correctedContentType,
+          reason: "URL pattern analysis",
+        });
+        contentType = correctedContentType;
       }
 
       // Determine file extension based on content type
