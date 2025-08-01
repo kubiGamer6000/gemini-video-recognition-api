@@ -30,14 +30,15 @@ export class VideoController {
 
       // Step 1: Download video
       const downloadStart = Date.now();
-      filePath = await this.downloadService.downloadVideo(videoUrl);
+      const downloadResult = await this.downloadService.downloadVideo(videoUrl);
+      filePath = downloadResult.filePath;
       downloadTime = Date.now() - downloadStart;
 
       // Step 2 & 3: Upload to Gemini and process
       const uploadStart = Date.now();
       const result = await this.geminiService.processVideo(
         filePath,
-        "video/mp4",
+        downloadResult.mimeType,
         prompt
       );
       const totalGeminiTime = Date.now() - uploadStart;
