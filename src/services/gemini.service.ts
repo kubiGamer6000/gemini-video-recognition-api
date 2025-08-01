@@ -84,7 +84,7 @@ export class GeminiService {
         filePath,
       });
       const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-pro-preview-03-25",
+        model: "gemini-2.5-pro",
         contents: createUserContent([
           createPartFromUri(videoFile.uri || "", videoFile.mimeType || ""),
           prompt,
