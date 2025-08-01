@@ -4,11 +4,11 @@
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["@google/genai", "axios", "uuid", "winston", "joi"]
+  external_node_modules = ["@google/genai", "axios", "uuid", "winston", "joi", "serverless-http", "express", "cors", "helmet", "express-rate-limit", "multer", "dotenv"]
   included_files = ["dist/**"]
 
 [[redirects]]
