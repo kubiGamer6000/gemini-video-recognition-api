@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm run build:netlify"
   functions = "netlify/functions"
   publish = "dist"
 
@@ -8,7 +8,8 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["@google/genai"]
+  external_node_modules = ["@google/genai", "axios"]
+  included_files = ["dist/**"]
 
 [[redirects]]
   from = "/api/*"
