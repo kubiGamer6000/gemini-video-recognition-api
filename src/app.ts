@@ -58,13 +58,16 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     endpoints: {
       health: "GET /health",
-      processVideo: "POST /api/process-video",
+      processVideo: "POST /api/process-video (sync, can timeout)",
+      createJob: "POST /api/jobs (async, recommended for long videos)",
+      getJobStatus: "GET /api/jobs/:jobId",
     },
     authentication: "API key required for /api/* endpoints",
+    note: "Use async endpoints (/api/jobs) for videos longer than 60 seconds to avoid timeouts",
   });
 });
 
-// Video processing endpoint
+// Video processing endpoint (synchronous - can timeout!)
 app.post(
   "/api/process-video",
   authenticateApiKey,
@@ -73,6 +76,20 @@ app.post(
     await videoController.processVideo(req, res);
   }
 );
+
+// Async video processing endpoints (recommended for long videos)
+app.post(
+  "/api/jobs",
+  authenticateApiKey,
+  validateVideoProcessRequest,
+  async (req, res) => {
+    await videoController.createJob(req, res);
+  }
+);
+
+app.get("/api/jobs/:jobId", authenticateApiKey, async (req, res) => {
+  await videoController.getJobStatus(req, res);
+});
 
 // 404 handler
 app.use((req, res) => {

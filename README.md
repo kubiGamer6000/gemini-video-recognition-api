@@ -98,13 +98,13 @@ No authentication required. Returns the health status of the API.
 }
 ```
 
-#### Process Video
+#### Process Video (Synchronous)
 
 ```http
 POST /api/process-video
 ```
 
-Processes a video from a URL using Google Gemini.
+Processes a video from a URL using Google Gemini. **⚠️ Warning: This endpoint can timeout for videos longer than ~60 seconds. Use the async endpoints below for longer videos.**
 
 **Headers:**
 
@@ -144,6 +144,99 @@ x-api-key: your-api-key
   "success": false,
   "error": "Failed to process video",
   "message": "Detailed error message"
+}
+```
+
+#### Create Async Job (Recommended for Long Videos)
+
+```http
+POST /api/jobs
+```
+
+Creates an async video processing job. Returns immediately with a job ID.
+
+**Headers:**
+
+```
+Content-Type: application/json
+x-api-key: your-api-key
+```
+
+**Request Body:**
+
+```json
+{
+  "videoUrl": "https://example.com/video.mp4",
+  "prompt": "Analyze this video and describe what's happening" // optional
+}
+```
+
+**Response (202 Accepted):**
+
+```json
+{
+  "success": true,
+  "jobId": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "pending",
+  "message": "Job created successfully. Poll /api/jobs/{jobId} for status."
+}
+```
+
+#### Get Job Status
+
+```http
+GET /api/jobs/{jobId}
+```
+
+Get the status and result of an async processing job.
+
+**Headers:**
+
+```
+x-api-key: your-api-key
+```
+
+**Response (Processing):**
+
+```json
+{
+  "success": true,
+  "jobId": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "processing",
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:10.000Z"
+}
+```
+
+**Response (Completed):**
+
+```json
+{
+  "success": true,
+  "jobId": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "completed",
+  "result": "The video shows...",
+  "processingTime": {
+    "download": 5000,
+    "upload": 10000,
+    "processing": 85000,
+    "total": 100000
+  },
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:01:40.000Z"
+}
+```
+
+**Response (Failed):**
+
+```json
+{
+  "success": true,
+  "jobId": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "failed",
+  "error": "Video processing failed: Internal error",
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:30.000Z"
 }
 ```
 
